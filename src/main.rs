@@ -43,20 +43,23 @@ struct Config {
 impl Config{
     fn build(args: &[String]) -> Result<Config, &'static str> {
         if args.len() < 3 {
-            return Err("Not enough arguments");
+            return Err("Not enough arguments: usage is <query> <file_path> or -C <query> <file_path>");
         }
 
-        let ignore_case = env::var("IGNORE_CASE").is_ok();
+        let mut args_offset = 1;
+        let mut ignore_case = env::var("IGNORE_CASE").is_ok();
 
-        if &args[1] == "-C" && args.len() == 4 {
-            let query = args[2].clone();
-            let file_path = args[3].clone();
-            let ignore_case = true;
+        if &args[1] == "-C"{
+            ignore_case = true;
+            args_offset = 2;
+        }
 
-            return Ok(Config { query, file_path, ignore_case })
-        } 
-        let query = args[1].clone();
-        let file_path = args[2].clone();
+        if args.len() - args_offset < 2 {
+            return Err("Not enough arguments: usage is <query> <file_path> or -C <query> <file_path>");
+        }
+
+        let query = args[args_offset].clone();
+        let file_path = args[args_offset + 1].clone();
         
 
         Ok(Config { query, file_path, ignore_case })
